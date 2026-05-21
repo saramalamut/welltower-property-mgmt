@@ -85,7 +85,7 @@ export default function App() {
               onStatusChange={setStatus}
               onAsOfDateChange={setAsOfDate}
             />
-            <RentRollTable rows={filteredRows} />
+            <RentRollTable rows={filteredRows} asOfDate={asOfDate} />
           </>
         )}
       </div>

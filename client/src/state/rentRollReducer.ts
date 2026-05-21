@@ -37,8 +37,31 @@ export function rentRollReducer(state: State, action: Action): State {
     case 'ERROR':
       return { ...state, status: 'error', error: action.error };
     case 'MOVE_IN':
-      return state;
+      return {
+        ...state,
+        rows: state.rows.map(r =>
+          r.property_id === action.property_id &&
+          r.unit_number === action.unit_number &&
+          r.date >= action.date
+            ? {
+                ...r,
+                resident_id: action.resident_id,
+                resident_name: action.resident_name,
+                monthly_rent_cents: action.monthly_rent_cents,
+              }
+            : r,
+        ),
+      };
     case 'MOVE_OUT':
-      return state;
+      return {
+        ...state,
+        rows: state.rows.map(r =>
+          r.property_id === action.property_id &&
+          r.unit_number === action.unit_number &&
+          r.date >= action.date
+            ? { ...r, resident_id: null, resident_name: null, monthly_rent_cents: 0 }
+            : r,
+        ),
+      };
   }
 }
