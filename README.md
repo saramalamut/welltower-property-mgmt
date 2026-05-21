@@ -11,6 +11,15 @@ See [`docs/data-flow.svg`](docs/data-flow.svg) for the state and data flow diagr
 
 </details>
 
+## Screenshot
+
+<details>
+<summary><strong>What the app looks like</strong> — KPI cards, per-property breakdown, rent roll with actions</summary>
+
+![App screenshot](docs/screenshot.png)
+
+</details>
+
 ## Prerequisites
 
 - Node 20 (see `.nvmrc` — `nvm use` if you have nvm)
