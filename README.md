@@ -9,26 +9,25 @@ Full-stack rent roll viewer with a KPI dashboard and move-in / move-out actions.
 
 ## Setup
 
-Install dependencies in each workspace:
+Install dependencies at the repo root and in each workspace:
 
 ```
+npm install
 cd server && npm install
 cd ../client && npm install
 ```
 
 ## Run
 
-Two terminals:
+From the repo root:
 
 ```
-# terminal 1
-cd server && npm run dev          # Express on http://localhost:3001
-
-# terminal 2
-cd client && npm run dev          # Vite on http://localhost:5173
+npm run dev    # Express on http://localhost:3001, Vite on http://localhost:5173
 ```
 
-The Vite dev server proxies `/api/*` to the server (see `client/vite.config.ts`). Open the Vite URL in a browser.
+This uses `concurrently` to run both processes in one terminal. The Vite dev server proxies `/api/*` to the server (see `client/vite.config.ts`). Open the Vite URL in a browser.
+
+If you'd rather not multiplex output, run `cd server && npm run dev` and `cd client && npm run dev` in separate terminals instead.
 
 ## Architecture
 
@@ -126,7 +125,6 @@ Vitest, KPI math only. Covers `averageRentByProperty`, `occupancyRateByProperty`
 - **Router.** Single page; adding one is ceremony for no benefit.
 - **State libraries (Redux, Zustand, React Query).** Context + reducer fits the data shape.
 - **Tests for components and endpoints.** Reviewer can read them directly. Tests are reserved for the high-risk KPI math — especially day-weighted occupancy.
-- **Root `package.json` with `concurrently`.** Two `npm run dev` commands is fine for a take-home and avoids the extra dep.
 
 ## Known follow-ups
 
