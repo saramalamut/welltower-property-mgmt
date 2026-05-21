@@ -30,6 +30,71 @@ cd client && npm run dev          # Vite on http://localhost:5173
 
 The Vite dev server proxies `/api/*` to the server (see `client/vite.config.ts`). Open the Vite URL in a browser.
 
+## Architecture
+
+### Components and technologies
+
+```mermaid
+flowchart LR
+  subgraph S["Server &nbsp;·&nbsp; Node 20 + Express + TypeScript"]
+    direction TB
+    CSV[("data/<br/>rent_roll.csv")]
+    Loader["loadRentRoll()<br/>csv-parse"]
+    Mem[("in-memory<br/>rent roll<br/>(integer cents)")]
+    API["/api/rent-roll<br/>/api/rent-roll/range"]
+    CSV --> Loader --> Mem --> API
+  end
+
+  subgraph C["Client &nbsp;·&nbsp; Vite + React + TypeScript + Tailwind v4"]
+    direction TB
+    ViteDev["Vite dev server :5173<br/>(proxies /api → :3001)"]
+    Ctx["RentRollProvider<br/>React Context + useReducer"]
+    UI["App · Table · KPI dashboard<br/>shadcn/ui (Button, Dialog,<br/>Input, Select, Table)"]
+    KPIs["lib/kpis.ts<br/>pure fns · Vitest"]
+    ViteDev --> Ctx --> UI
+    UI --> KPIs
+  end
+
+  Browser((Browser)) <--> ViteDev
+  Ctx -- "fetch /api/rent-roll" --> API
+```
+
+### Initial load — client to server
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant U as Browser
+  participant V as Vite dev server (:5173)
+  participant R as React app
+  participant P as RentRollProvider<br/>(Context + reducer)
+  participant E as Express (:3001)
+
+  Note over E: At boot, loadRentRoll()<br/>parses CSV into memory (cents)
+
+  U->>V: GET /
+  V-->>U: index.html + JS modules<br/>(TS/JSX compiled on the fly)
+  U->>R: createRoot().render(<App/>)
+  R->>P: mount RentRollProvider
+  P->>P: dispatch LOADING
+  P->>V: fetch('/api/rent-roll')
+  V->>E: proxy → :3001/api/rent-roll
+  E-->>V: 200 JSON (rent roll rows)
+  V-->>P: JSON
+  P->>P: dispatch SET_ROWS
+  P->>R: re-render with rows
+  R-->>U: Table + KPI dashboard
+```
+
+Step by step:
+
+1. **Server boot.** `tsx watch` runs `server/src/index.ts`. `loadRentRoll()` reads `data/rent_roll.csv`, parses with `csv-parse/sync`, validates each row, and converts dollars to integer cents. Express listens on `:3001`.
+2. **Client boot.** `vite` serves `index.html` on `:5173` and compiles TS/JSX on demand. The browser loads `src/main.tsx`, which mounts `<App />` inside `<RentRollProvider>`.
+3. **Mount effect.** The provider's `useEffect` dispatches `LOADING`, then calls `fetchRentRoll()` → `fetch('/api/rent-roll')`.
+4. **Proxy hop.** Vite's dev proxy forwards `/api/*` to `http://localhost:3001`, so the browser never sees a cross-origin request.
+5. **Server response.** Express returns the cached in-memory rent roll as JSON — no disk read, no DB.
+6. **Reducer + render.** The provider dispatches `SET_ROWS`. Components subscribed via `useRentRoll()` re-render. KPI components recompute from `lib/kpis.ts` (pure functions over the rows + current date range).
+
 ## Tests
 
 ```
