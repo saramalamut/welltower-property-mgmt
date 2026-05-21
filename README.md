@@ -43,7 +43,7 @@ From the repo root:
 npm run dev    # Express on http://localhost:3001, Vite on http://localhost:5173
 ```
 
-This uses `concurrently` to run both processes in one terminal. The Vite dev server proxies `/api/*` to the server (see `client/vite.config.ts`). Open the Vite URL in a browser.
+This uses `concurrently` to run both processes in one terminal. The Vite dev server proxies `/api/*` to the server (see `client/vite.config.ts`). **Open the Vite URL in a browser.**
 
 If you'd rather not multiplex output, run `cd server && npm run dev` and `cd client && npm run dev` in separate terminals instead.
 
@@ -65,9 +65,9 @@ Vitest, KPI math only. Covers `averageRentByProperty`, `occupancyRateByProperty`
 
 ## Architectural decisions
 
-- **CSV in, JSON out, in-memory.** No database. Server exposes `/api/rent-roll` and `/api/rent-roll/range`.
+- **CSV in, JSON out, in-memory.** No database. Server exposes a single `/api/rent-roll` endpoint; the client fetches once on boot and does all range-filtering and KPI math locally. At 13k rows the dataset fits comfortably in the client, and keeping mutations and KPI inputs in the same store avoids reconciling against server-filtered slices.
 - **Client-side state for mutations.** React Context + `useReducer` (`client/src/state/RentRollContext.tsx`, `rentRollReducer.ts`). Move-in / move-out dispatch actions update the local store; nothing round-trips to the server.
-- **KPI math as pure functions.** All four KPIs are pure `(rentRoll, fromDate, toDate)` functions in `client/src/lib/kpis.ts`. No mocks required to test them.
+- **KPI math as pure functions.** All four KPIs are pure `(rentRoll, fromDate, toDate)` functions in `client/src/lib/kpis.ts`. No mocks required to test them. KPIs always show the full portfolio plus a per-property breakdown; the rent-roll table's property filter is independent and does not gate them.
 - **shadcn/ui over hand-rolled components.** Table, Dialog, Button, Input, Select. Tailwind v4 via `@tailwindcss/vite`.
 - **TypeScript strict on both sides.** No `any`; `unknown` + narrowing where escape from the type system is unavoidable.
 
@@ -83,6 +83,7 @@ Vitest, KPI math only. Covers `averageRentByProperty`, `occupancyRateByProperty`
 
 - Real backend persistence — DB plus write endpoints for move-in / move-out so mutations survive a restart.
 - Audit log of mutations (who, when, what changed). Currently mutations are ephemeral.
+- Event-sourced snapshots. Move-in / move-out overwrite snapshot rows in place from the action date forward, so the original fact at the action date is lost. A real PM system would store the events and derive snapshots from them.
 - More actions: rent change, lease renewal, unit transfer.
 - Virtualized table (e.g. TanStack Virtual) for full-period views over larger rent rolls.
 - Auth and per-property access control.

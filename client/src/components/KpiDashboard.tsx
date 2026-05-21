@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 import { endOfMonth, format, parseISO, startOfMonth, subMonths } from 'date-fns';
 import {
   Table,
@@ -48,15 +48,18 @@ const formatPercent = (ratio: number): string => `${(ratio * 100).toFixed(1)}%`;
 
 export function KpiDashboard({ rows, properties, minDate, maxDate }: Props) {
   const [range, setRange] = useState(() => defaultRange(minDate, maxDate));
+  // Inputs stay snappy on every keystroke; KPI passes (four full-CSV walks)
+  // only re-run when the date inputs quiesce.
+  const deferredRange = useDeferredValue(range);
 
   const kpis = useMemo(
     () => ({
-      avgRent: averageRentByProperty(rows, range.from, range.to),
-      occupancy: occupancyRateByProperty(rows, range.from, range.to),
-      moveIns: moveInsInPeriod(rows, range.from, range.to),
-      moveOuts: moveOutsInPeriod(rows, range.from, range.to),
+      avgRent: averageRentByProperty(rows, deferredRange.from, deferredRange.to),
+      occupancy: occupancyRateByProperty(rows, deferredRange.from, deferredRange.to),
+      moveIns: moveInsInPeriod(rows, deferredRange.from, deferredRange.to),
+      moveOuts: moveOutsInPeriod(rows, deferredRange.from, deferredRange.to),
     }),
-    [rows, range.from, range.to],
+    [rows, deferredRange.from, deferredRange.to],
   );
 
   const rangeInvalid = range.from && range.to && range.from > range.to;
