@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRentRoll } from './state/RentRollContext';
+import { KpiDashboard } from './components/KpiDashboard';
 import { RentRollFilters } from './components/RentRollFilters';
 import { RentRollTable } from './components/RentRollTable';
 import type { RentRollRow } from './types';
@@ -67,6 +68,12 @@ export default function App() {
 
         {state.status === 'ready' && (
           <>
+            <KpiDashboard
+              rows={state.rows}
+              properties={properties}
+              minDate={earliestDate}
+              maxDate={mostRecentDate}
+            />
             <RentRollFilters
               properties={properties}
               propertyId={propertyId}
