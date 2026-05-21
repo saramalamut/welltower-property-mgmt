@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 580" role="img" aria-labelledby="diagTitle diagDesc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif">
+  <title id="diagTitle">System architecture</title>
+  <desc id="diagDesc">Three tiers: browser, server, data. The browser talks to the server over HTTP and JSON. The server reads rent_roll.csv on boot.</desc>
+
+  <style><![CDATA[
+    svg {
+      --fg: #1f2328;
+      --muted: #59636e;
+      --border: #d1d9e0;
+      --tier: #f6f8fa;
+      --box: #ffffff;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --fg: #f0f6fc;
+        --muted: #9198a1;
+        --border: #3d444d;
+        --tier: #151b23;
+        --box: #0d1117;
+      }
+    }
+    .tier { fill: var(--tier); stroke: var(--border); stroke-width: 1; }
+    .box { fill: var(--box); stroke: var(--border); stroke-width: 1; }
+    .title-text { fill: var(--fg); font-weight: 600; font-size: 20px; }
+    .subtitle-text { fill: var(--muted); font-size: 13px; }
+    .tier-label { fill: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: 0.4px; }
+    .box-label { fill: var(--fg); font-weight: 600; font-size: 14px; }
+    .box-sublabel { fill: var(--muted); font-size: 12px; }
+    .edge { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+    .edge-label { fill: var(--muted); font-size: 12px; }
+    .arrow-head { fill: var(--muted); }
+  ]]></style>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head" />
+    </marker>
+  </defs>
+
+  <text x="40" y="36" class="title-text">System architecture</text>
+  <text x="40" y="58" class="subtitle-text">Three tiers, in-process</text>
+
+  <!-- Browser tier -->
+  <rect x="40" y="85" width="880" height="135" rx="10" class="tier" />
+  <text x="60" y="108" class="tier-label">Browser</text>
+
+  <rect x="80" y="125" width="240" height="80" rx="6" class="box" />
+  <text x="200" y="158" class="box-label" text-anchor="middle">React + Vite</text>
+  <text x="200" y="178" class="box-sublabel" text-anchor="middle">UI and dev server</text>
+
+  <rect x="360" y="125" width="240" height="80" rx="6" class="box" />
+  <text x="480" y="158" class="box-label" text-anchor="middle">React Context + useReducer</text>
+  <text x="480" y="178" class="box-sublabel" text-anchor="middle">In-memory store</text>
+
+  <rect x="640" y="125" width="240" height="80" rx="6" class="box" />
+  <text x="760" y="158" class="box-label" text-anchor="middle">shadcn/ui</text>
+  <text x="760" y="178" class="box-sublabel" text-anchor="middle">Table, dialog, inputs</text>
+
+  <!-- Browser <-> Server -->
+  <path d="M 460,225 L 460,265" class="edge" marker-end="url(#arrow)" />
+  <path d="M 500,265 L 500,225" class="edge" marker-end="url(#arrow)" />
+  <text x="540" y="251" class="edge-label">HTTP / JSON</text>
+
+  <!-- Server tier -->
+  <rect x="40" y="275" width="880" height="135" rx="10" class="tier" />
+  <text x="60" y="298" class="tier-label">Server</text>
+
+  <rect x="180" y="315" width="260" height="80" rx="6" class="box" />
+  <text x="310" y="348" class="box-label" text-anchor="middle">Express API</text>
+  <text x="310" y="368" class="box-sublabel" text-anchor="middle">/api/rent-roll</text>
+
+  <rect x="520" y="315" width="260" height="80" rx="6" class="box" />
+  <text x="650" y="348" class="box-label" text-anchor="middle">csv-parse + TypeScript</text>
+  <text x="650" y="368" class="box-sublabel" text-anchor="middle">Parse on boot</text>
+
+  <!-- Server -> Data -->
+  <path d="M 480,415 L 480,460" class="edge" marker-end="url(#arrow)" />
+  <text x="495" y="442" class="edge-label">Read on boot</text>
+
+  <!-- Data tier -->
+  <rect x="40" y="470" width="880" height="90" rx="10" class="tier" />
+  <text x="60" y="493" class="tier-label">Data</text>
+
+  <rect x="360" y="500" width="240" height="50" rx="6" class="box" />
+  <text x="480" y="522" class="box-label" text-anchor="middle">data/rent_roll.csv</text>
+  <text x="480" y="540" class="box-sublabel" text-anchor="middle">Source of truth</text>
+</svg>
