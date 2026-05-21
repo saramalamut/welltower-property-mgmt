@@ -2,6 +2,15 @@
 
 Full-stack rent roll viewer with a KPI dashboard and move-in / move-out actions. Take-home assessment.
 
+<details>
+<summary><strong>Architecture diagram</strong> — three tiers (browser, server, data)</summary>
+
+![System architecture](docs/architecture.svg)
+
+See [`docs/data-flow.svg`](docs/data-flow.svg) for the state and data flow diagram (boot, render, action loop).
+
+</details>
+
 ## Prerequisites
 
 - Node 20 (see `.nvmrc` — `nvm use` if you have nvm)

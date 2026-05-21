@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 660" role="img" aria-labelledby="diagTitle diagDesc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif">
+  <title id="diagTitle">State and data flow</title>
+  <desc id="diagDesc">App load reads CSV on server boot, exposes it via the API, the client fetches on mount, dispatches LOAD to RentRollContext, and components render. Move-in and move-out dispatch their own actions that loop back through the context to re-render.</desc>
+
+  <style><![CDATA[
+    svg {
+      --fg: #1f2328;
+      --muted: #59636e;
+      --border: #d1d9e0;
+      --box: #ffffff;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --fg: #f0f6fc;
+        --muted: #9198a1;
+        --border: #3d444d;
+        --box: #0d1117;
+      }
+    }
+    .box { fill: var(--box); stroke: var(--border); stroke-width: 1; }
+    .title-text { fill: var(--fg); font-weight: 600; font-size: 20px; }
+    .subtitle-text { fill: var(--muted); font-size: 13px; }
+    .box-label { fill: var(--fg); font-weight: 600; font-size: 14px; }
+    .box-sublabel { fill: var(--muted); font-size: 12px; }
+    .edge { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+    .edge-label { fill: var(--muted); font-size: 12px; }
+    .arrow-head { fill: var(--muted); }
+  ]]></style>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head" />
+    </marker>
+  </defs>
+
+  <text x="40" y="36" class="title-text">State and data flow</text>
+  <text x="40" y="58" class="subtitle-text">Boot, render, action loop</text>
+
+  <!-- Step 1: Server boot -->
+  <rect x="380" y="86" width="220" height="60" rx="6" class="box" />
+  <text x="490" y="113" class="box-label" text-anchor="middle">Server boot</text>
+  <text x="490" y="132" class="box-sublabel" text-anchor="middle">Read CSV into memory</text>
+
+  <path d="M 490,146 L 490,174" class="edge" marker-end="url(#arrow)" />
+
+  <!-- Step 2: API endpoint -->
+  <rect x="380" y="176" width="220" height="60" rx="6" class="box" />
+  <text x="490" y="203" class="box-label" text-anchor="middle">GET /api/rent-roll</text>
+  <text x="490" y="222" class="box-sublabel" text-anchor="middle">Plain JSON response</text>
+
+  <path d="M 490,236 L 490,264" class="edge" marker-end="url(#arrow)" />
+
+  <!-- Step 3: Client fetch -->
+  <rect x="380" y="266" width="220" height="60" rx="6" class="box" />
+  <text x="490" y="293" class="box-label" text-anchor="middle">Client fetch on mount</text>
+  <text x="490" y="312" class="box-sublabel" text-anchor="middle">useEffect at app load</text>
+
+  <path d="M 490,326 L 490,354" class="edge" marker-end="url(#arrow)" />
+
+  <!-- Step 4: Context dispatch LOAD -->
+  <rect x="380" y="356" width="220" height="60" rx="6" class="box" />
+  <text x="490" y="383" class="box-label" text-anchor="middle">RentRollContext</text>
+  <text x="490" y="402" class="box-sublabel" text-anchor="middle">Dispatch LOAD</text>
+
+  <path d="M 490,416 L 490,444" class="edge" marker-end="url(#arrow)" />
+
+  <!-- Step 5: Render -->
+  <rect x="380" y="446" width="220" height="60" rx="6" class="box" />
+  <text x="490" y="473" class="box-label" text-anchor="middle">Components render</text>
+  <text x="490" y="492" class="box-sublabel" text-anchor="middle">Table and KPIs</text>
+
+  <!-- Branch to user actions -->
+  <path d="M 490,506 L 490,536" class="edge" />
+  <path d="M 250,536 L 730,536" class="edge" />
+  <path d="M 250,536 L 250,569" class="edge" marker-end="url(#arrow)" />
+  <path d="M 730,536 L 730,569" class="edge" marker-end="url(#arrow)" />
+
+  <!-- Move-in -->
+  <rect x="140" y="571" width="220" height="60" rx="6" class="box" />
+  <text x="250" y="598" class="box-label" text-anchor="middle">Move-in action</text>
+  <text x="250" y="617" class="box-sublabel" text-anchor="middle">Dispatch MOVE_IN</text>
+
+  <!-- Move-out -->
+  <rect x="620" y="571" width="220" height="60" rx="6" class="box" />
+  <text x="730" y="598" class="box-label" text-anchor="middle">Move-out action</text>
+  <text x="730" y="617" class="box-sublabel" text-anchor="middle">Dispatch MOVE_OUT</text>
+
+  <!-- Loop arrows back to RentRollContext -->
+  <path d="M 140,601 L 60,601 L 60,386 L 376,386" class="edge" marker-end="url(#arrow)" />
+  <path d="M 840,601 L 900,601 L 900,386 L 604,386" class="edge" marker-end="url(#arrow)" />
+
+  <text x="68" y="376" class="edge-label">Update and re-render</text>
+  <text x="892" y="376" class="edge-label" text-anchor="end">Update and re-render</text>
+</svg>
