@@ -11,7 +11,7 @@ See [`docs/data-flow.svg`](docs/data-flow.svg) for the state and data flow diagr
 
 </details>
 
-## Screenshot
+## Product Demo
 
 <details>
 <summary><strong>What the app looks like</strong> — KPI cards, per-property breakdown, rent roll with actions</summary>
@@ -19,6 +19,10 @@ See [`docs/data-flow.svg`](docs/data-flow.svg) for the state and data flow diagr
 ![App screenshot](docs/screenshot.png)
 
 </details>
+
+This video walks through the UI, KPI dashboard, filtering experience, and resident management workflows implemented for the assessment.
+
+🎥 [View Demo Recording](https://www.loom.com/share/d5b16bf2f34640d9a2080a0882f1fdc9)
 
 ## Prerequisites
 
