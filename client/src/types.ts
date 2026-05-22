@@ -7,14 +7,3 @@ export interface RentRollRow {
   resident_name: string | null;
   monthly_rent_cents: number;
 }
-
-export interface DateRange {
-  start: string;
-  end: string;
-}
-
-export interface FilterState {
-  propertyId?: number;
-  occupancy?: 'occupied' | 'vacant';
-  search?: string;
-}

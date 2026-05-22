@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { addYears, format, parseISO } from 'date-fns';
 import {
   Dialog,
   DialogClose,
@@ -26,7 +27,18 @@ interface Errors {
   rent?: string;
 }
 
-function validate(name: string, date: string, rent: string, asOfDate: string): Errors {
+// Rent range sized for senior living: high-end memory care can exceed
+// $50k/month, so a tighter ceiling would reject valid market rents.
+const MIN_RENT_USD = 500;
+const MAX_RENT_USD = 100_000;
+
+function validate(
+  name: string,
+  date: string,
+  rent: string,
+  asOfDate: string,
+  maxDate: string,
+): Errors {
   const errors: Errors = {};
   const trimmed = name.trim();
   if (trimmed.length < 2 || trimmed.length > 80) {
@@ -36,12 +48,14 @@ function validate(name: string, date: string, rent: string, asOfDate: string): E
     errors.date = 'Move-in date is required.';
   } else if (date < asOfDate) {
     errors.date = `Move-in date must be on or after the as-of date (${asOfDate}).`;
+  } else if (maxDate && date > maxDate) {
+    errors.date = `Move-in date must be within one year of the as-of date (on or before ${maxDate}).`;
   }
   const rentNum = Number(rent);
   if (!rent || Number.isNaN(rentNum)) {
     errors.rent = 'Monthly rent is required.';
-  } else if (rentNum < 500 || rentNum > 50000) {
-    errors.rent = 'Monthly rent must be between $500 and $50,000.';
+  } else if (rentNum < MIN_RENT_USD || rentNum > MAX_RENT_USD) {
+    errors.rent = `Monthly rent must be between $${MIN_RENT_USD.toLocaleString()} and $${MAX_RENT_USD.toLocaleString()}.`;
   }
   return errors;
 }
@@ -53,6 +67,11 @@ export function MoveInDialog({ open, onOpenChange, row, asOfDate }: Props) {
   const [rent, setRent] = useState('');
   const [attempted, setAttempted] = useState(false);
 
+  const maxMoveInDate = useMemo(
+    () => (asOfDate ? format(addYears(parseISO(asOfDate), 1), 'yyyy-MM-dd') : ''),
+    [asOfDate],
+  );
+
   useEffect(() => {
     if (open) {
       setName('');
@@ -63,8 +82,8 @@ export function MoveInDialog({ open, onOpenChange, row, asOfDate }: Props) {
   }, [open, asOfDate, row?.property_id, row?.unit_number]);
 
   const errors = useMemo(
-    () => validate(name, date, rent, asOfDate),
-    [name, date, rent, asOfDate],
+    () => validate(name, date, rent, asOfDate, maxMoveInDate),
+    [name, date, rent, asOfDate, maxMoveInDate],
   );
   const showErrors = attempted;
 
@@ -73,7 +92,7 @@ export function MoveInDialog({ open, onOpenChange, row, asOfDate }: Props) {
     setAttempted(true);
     if (Object.keys(errors).length > 0 || !row) return;
     const nextResidentId =
-      Math.max(0, ...state.rows.map(r => r.resident_id ?? 0)) + 1;
+      state.rows.reduce((max, r) => Math.max(max, r.resident_id ?? 0), 0) + 1;
     dispatch({
       type: 'MOVE_IN',
       date,
@@ -124,6 +143,7 @@ export function MoveInDialog({ open, onOpenChange, row, asOfDate }: Props) {
               type="date"
               value={date}
               min={asOfDate || undefined}
+              max={maxMoveInDate || undefined}
               onChange={e => setDate(e.target.value)}
               aria-invalid={showErrors && !!errors.date}
             />
@@ -138,8 +158,8 @@ export function MoveInDialog({ open, onOpenChange, row, asOfDate }: Props) {
               id="move-in-rent"
               type="number"
               inputMode="decimal"
-              min={500}
-              max={50000}
+              min={MIN_RENT_USD}
+              max={MAX_RENT_USD}
               step={1}
               placeholder="2000"
               value={rent}

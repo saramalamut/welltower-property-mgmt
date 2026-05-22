@@ -36,6 +36,9 @@ export function rentRollReducer(state: State, action: Action): State {
       return { rows: action.rows, status: 'ready' };
     case 'ERROR':
       return { ...state, status: 'error', error: action.error };
+    // Move-in/out is a forward-effective assertion, not an audit-logged event:
+    // every snapshot for this unit on/after action.date is overwritten in place.
+    // See README "Known follow-ups" for the event-sourced alternative.
     case 'MOVE_IN':
       return {
         ...state,
