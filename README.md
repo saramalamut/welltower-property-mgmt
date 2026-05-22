@@ -89,6 +89,7 @@ Vitest, KPI math only. Covers `averageRentByProperty`, `occupancyRateByProperty`
 - Audit log of mutations (who, when, what changed). Currently mutations are ephemeral.
 - Event-sourced snapshots. Move-in / move-out overwrite snapshot rows in place from the action date forward, so the original fact at the action date is lost. A real PM system would store the events and derive snapshots from them.
 - More actions: rent change, lease renewal, unit transfer.
+- KPI visualizations and trend charts to better compare property performance over time and make occupancy/revenue trends easier to analyze visually.
 - Virtualized table (e.g. TanStack Virtual) for full-period views over larger rent rolls.
 - Auth and per-property access control.
 - Server-side filtering and pagination if the dataset outgrows what's reasonable to ship to the client.
